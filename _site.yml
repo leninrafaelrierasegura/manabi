@@ -1,0 +1,26 @@
+name: "Manabi"
+output_dir: "docs"
+navbar:
+  title: "Manabi"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+    - text: "Administrative Units"
+      href: administrative_units.html
+    - text: "Amenities"
+      href: amenities.html
+
+  right:
+    - icon: fa-github
+      href: https://github.com/leninrafaelrierasegura/manabi
+
+output:
+  html_document:
+    highlight: textmate
+    mainfont: "Gill Sans"
+    theme: flatly
+    # css: style.css
+    # toc: true
+

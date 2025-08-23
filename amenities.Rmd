@@ -1,0 +1,184 @@
+---
+title: "Amenities from Geodatabase Nacional"
+date: "Last modified: `r format(Sys.time(), '%d-%m-%Y.')`"
+output:
+  html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    highlight: pygments
+    theme: flatly
+    code_folding: show # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    number_sections: true
+    fig_caption: true
+    code_download: true
+    css: visual.css
+always_allow_html: true
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+---
+
+```{r}
+# Create a clipboard button on the rendered HTML page
+source(here::here("clipboard.R")); clipboard
+# Set seed for reproducibility
+set.seed(1982) 
+# Set global options for all code chunks
+knitr::opts_chunk$set(
+  # Disable messages printed by R code chunks
+  message = FALSE,    
+  # Disable warnings printed by R code chunks
+  warning = FALSE,    
+  # Show R code within code chunks in output
+  echo = TRUE,        
+  # Include both R code and its results in output
+  include = TRUE,     
+  # Evaluate R code chunks
+  eval = TRUE,       
+  # Enable caching of R code chunks for faster rendering
+  cache = FALSE,      
+  # Align figures in the center of the output
+  fig.align = "center",
+  # Enable retina display for high-resolution figures
+  retina = 2,
+  # Show errors in the output instead of stopping rendering
+  error = TRUE,
+  # Do not collapse code and output into a single block
+  collapse = FALSE
+)
+# Start the figure counter
+fig_count <- 0
+# Define the captioner function
+captioner <- function(caption) {
+  fig_count <<- fig_count + 1
+  paste0("Figure ", fig_count, ": ", caption)
+}
+```
+
+
+```{r}
+library(sf)
+library(tmap)
+library(mapview)
+library(dplyr)
+# set mapview options
+mapviewOptions(basemaps = c("CartoDB.Positron",
+                            "OpenStreetMap",
+                            "Esri.WorldImagery",
+                            "OpenTopoMap"))
+```
+
+# Introduction
+
+In this section, we will explore the amenities available in the Geodatabase Nacional of Ecuador. The data was obtained from this [website](https://www.ecuadorencifras.gob.ec/documentos/web-inec/Geografia_Estadistica/Micrositio_geoportal/index.html). On the page, go to the bottom section (called Cartografia Historica) of the page and click on `2022` and then on the `Descarga de Marco Geoestadístico 2021` button. This will download a file named `GEODATABASE_NACIONAL_2021.zip`. Unzip the file and you will find a folder named `GEODATABASE_NACIONAL_2021`. Inside this folder, there is a file named `GEODATABASE_NACIONAL_2021.gpkg`, which is a geopackage file containing several (9) layers. Using the [`manabi_area_simple.RDS`](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/manabi_area_simple.RDS) file, I filtered the contents of each layer.
+
+---
+
+By the way, the number of the layers are:
+
+```{r}
+LAYERS_name <- c("viv_p", "ejes_l", "zon_a", "sec_a", "loc_p", "ingresos_l", "ca04_a", "aream_a", "man_a")
+```
+
+---
+
+Most of the layers do not contain useful information for our purposes. Here are some details about the layers:
+
+- `aream_a`: This layer seems to contain the head of the administrative areas as polygons, such as provinces, cantons, and parishes.
+- `loc_p`: This layer contains the locations of small towns and villages, apparently.
+- `ca04_a`: This layer contains the locations of amenities, such as schools, hospitals, and other public buildings.
+
+
+```{r}
+area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
+p <- mapview(
+  area_of_interest,
+  zcol = "geometry",        # attribute used for fill
+  alpha.regions = 0,    # fill transparency
+  color = "black",        # border color
+  alpha = 0.4,            # border transparency
+  legend = FALSE           # remove legend
+)
+```
+
+# layer `aream_a`
+
+
+
+```{r, out.width = "100%", fig.cap = captioner("Area of the head of the administrative units.")}
+aream_a <- readRDS("clean_data/aream_a_cropped_to_manabi.RDS")
+mapview(
+  aream_a,
+  zcol = "tipo_aream",        # attribute used for fill
+  alpha.regions = 0.4,    # fill transparency
+  color = "black",        # border color
+  alpha = 1,            # border transparency
+  legend = TRUE           # remove legend
+) + p
+```
+
+# layer `loc_p`
+
+
+```{r, out.width = "100%", fig.cap = captioner("Small towns and villages, apparently.")}
+loc_p <- readRDS("clean_data/loc_p_cropped_to_manabi.RDS")
+mapview(
+  loc_p,
+  zcol = "n_loc",        # attribute used for fill
+  alpha.regions = 0.4,    # fill transparency
+  color = "black",        # border color
+  alpha = 0.2,            # border transparency
+  cex = 1.5, #           points size
+  
+  legend = FALSE           # remove legend
+) + p
+```
+
+
+# layer `ca04_a`
+
+```{r}
+# ca04_a <- readRDS("clean_data/ca04_a_cropped_to_manabi.RDS")
+# amn <- unique(ca04_a$cod_otros) # check the unique values of the cod_otros column
+# amn
+#  [1] NA                         "EDIFICIO EDUCACIONAL"     "TEMPLO RELIGIOSO"        
+#  [4] "CASA COMUNAL"             "EDIFICIO IMPORTANTE"      "EDIFICIO DE REFERENCIA"  
+#  [7] "CAMPO DEPORTIVO"          "CEMENTERIO"               "GASOLINERA"              
+# [10] "ESTABLECIMIENTO DE SALUD" "PARQUE"                   "PLAZA"                   
+# [13] "TANQUE DE AGUA"           "EDIFICIO REFERENCIA" 
+# for (i in 2:length(amn)) {
+#   aux <- filter(ca04_a, cod_otros == amn[i])
+#   saveRDS(aux, paste0("clean_data/amn_", gsub(" ", "_", amn[i]), ".RDS"))
+# }
+```
+
+Here we can see the `EDIFICIO EDUCACIONAL` amenities.
+
+```{r, out.width = "100%", fig.cap = captioner("Educational buildings.")}
+amn_EDIFICIO_EDUCACIONAL <- readRDS("clean_data/amn_EDIFICIO_EDUCACIONAL.RDS")
+mapview(
+    amn_EDIFICIO_EDUCACIONAL,
+    zcol = "nom_edif",        # attribute used for fill
+    alpha.regions = 0.4,    # fill transparency
+    color = "black",        # border color
+    alpha = 1,            # border transparency
+    legend = FALSE           # remove legend
+  ) + p
+```
+
+
+
+
+# References 
+
+```{r}
+grateful::cite_packages(output = "paragraph", out.dir = ".")
+```
+
+
+
+

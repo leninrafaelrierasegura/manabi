@@ -1,0 +1,189 @@
+---
+title: "Administrative Units"
+date: "Last modified: `r format(Sys.time(), '%d-%m-%Y.')`"
+output:
+  html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    highlight: pygments
+    theme: flatly
+    code_folding: show # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    number_sections: true
+    fig_caption: true
+    code_download: true
+    css: visual.css
+always_allow_html: true
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+---
+
+```{r}
+# Create a clipboard button on the rendered HTML page
+source(here::here("clipboard.R")); clipboard
+# Set seed for reproducibility
+set.seed(1982) 
+# Set global options for all code chunks
+knitr::opts_chunk$set(
+  # Disable messages printed by R code chunks
+  message = FALSE,    
+  # Disable warnings printed by R code chunks
+  warning = FALSE,    
+  # Show R code within code chunks in output
+  echo = TRUE,        
+  # Include both R code and its results in output
+  include = TRUE,     
+  # Evaluate R code chunks
+  eval = TRUE,       
+  # Enable caching of R code chunks for faster rendering
+  cache = FALSE,      
+  # Align figures in the center of the output
+  fig.align = "center",
+  # Enable retina display for high-resolution figures
+  retina = 2,
+  # Show errors in the output instead of stopping rendering
+  error = TRUE,
+  # Do not collapse code and output into a single block
+  collapse = FALSE
+)
+# Start the figure counter
+fig_count <- 0
+# Define the captioner function
+captioner <- function(caption) {
+  fig_count <<- fig_count + 1
+  paste0("Figure ", fig_count, ": ", caption)
+}
+```
+
+```{r}
+library(sf)
+library(tmap)
+library(mapview)
+# set mapview options
+mapviewOptions(basemaps = c("OpenStreetMap",
+                            "Esri.WorldImagery",
+                            "OpenTopoMap"))
+
+source("jobbers/custom_bounding_box.R")
+```
+
+
+# Introduction
+
+Let us first show the area of interest. I show it at the four available levels: country, province, canton, and parish. The data is from the [GADM](https://gadm.org/) project, which provides high-resolution maps of administrative areas worldwide.
+
+Here are the specific steps:
+
+- Go to this [website](https://gadm.org/download_country.html)
+- In the search bar, type Ecuador
+- Click on the "Geopackage" hyperlink
+- This will download a file named `gadm41_ECU.gpkg`
+- This is a file with several layers, each representing a different administrative level
+- If you do `st_layers("gadm41_ECU.gpkg")`, you will see the available layers, which are `ADM_ADM_0`, `ADM_ADM_1`, `ADM_ADM_2`, and `ADM_ADM_3`. These correspond to country, province, canton, and parish, respectively.
+
+# Data manipulation
+
+Here are the steps I follow to obtain the files below (see this [script](https://github.com/leninrafaelrierasegura/manabi/blob/main/administrative_units.R) for more details):
+
+- Read the layers from the `gadm41_ECU.gpkg` file
+- Get the polygon that represents the mainland of Ecuador. With that polygon at hand, filter the layers to keep only the features that are inside the mainland polygon. That way islands (even The Galapagos) and other features that are not part of the mainland are removed. `I did this because at the moment I wanted to do the analysis on the entire mainland of Ecuador.`
+- But then I realized that is not doable, so I created a custom polygon that delimits the area of interest. This polygon is defined by the coordinates of the four corners: Northeast, Southeast, Southwest, and Northwest. The coordinates are defined in this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/jobbers/custom_bounding_box.R). 
+
+
+---
+
+Note: The area of interest is delimited by the coordinates defined in this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/jobbers/custom_bounding_box.R). The corresponding `sf` object is stored [here](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/manabi_bbox_custom.RDS). However, a more adequate area for future analysis can be found [here](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/manabi_area_simple.RDS). This area is not a box but a polygon that follows the administrative boundaries of the country.
+
+---
+
+- With the custom polygon at hand, I crop the layers to keep only the features that are inside the custom polygon. This is done using the `st_intersection()` function from the `sf` package.
+
+
+```{r}
+# read the files
+gadm41_ECU_country <- readRDS("clean_data/gadm41_ECU_country_custom.RDS")
+gadm41_ECU_provinces <- readRDS("clean_data/gadm41_ECU_province_custom.RDS")
+gadm41_ECU_cantons <- readRDS("clean_data/gadm41_ECU_canton_custom.RDS")
+gadm41_ECU_parishes <- readRDS("clean_data/gadm41_ECU_parish_custom.RDS")
+```
+
+# Visualization of the area of interest
+
+I choose the following polygon to delimit the area of interest. The polygon is defined by the coordinates of the four corners: Northeast, Southeast, Southwest, and Northwest.
+
+```{r, out.width = "100%", fig.cap = captioner("This shows the polygon that delimits the area of interest. Click on the region to see more details.")}
+coords <- rbind(NE, SE, SW, NW, NE) # from source("jobbers/custom_bounding_box.R")
+crop_polygon <- st_polygon(list(coords)) %>% 
+  st_sfc(crs = st_crs(gadm41_ECU_country)) # match CRS of your data
+crop_polygon_sf <- st_sf(geom = crop_polygon)
+mapview::mapview(crop_polygon_sf,
+                 alpha.regions = 0.4,    # fill transparency
+                 color = "black",        # border color
+                 alpha = 1,            # border transparency
+                 legend = FALSE)
+```
+
+
+## At the country level
+
+```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the country level. Click on the region to see more details.")}
+mapview(
+  gadm41_ECU_country,
+  zcol = "COUNTRY",        # attribute used for fill
+  alpha.regions = 0.4,    # fill transparency
+  color = "black",        # border color
+  alpha = 1,            # border transparency
+  legend = FALSE           # remove legend
+)
+```
+
+## At the province level
+
+```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the province level. Click on the region to see more details.")}
+mapview(
+  gadm41_ECU_provinces,
+  zcol = "NAME_1",        # attribute used for fill
+  alpha.regions = 0.4,    # fill transparency
+  color = "black",        # border color
+  alpha = 1,            # border transparency
+  legend = FALSE           # remove legend
+)
+```
+
+## At the canton level
+
+```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the canton level. Click on the region to see more details.")}
+mapview(
+  gadm41_ECU_cantons,
+  zcol = "NAME_2",        # attribute used for fill
+  alpha.regions = 0.4,    # fill transparency
+  color = "black",        # border color
+  alpha = 1,            # border transparency
+  legend = FALSE           # remove legend
+)
+```
+
+## At the parish level
+
+```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the parish level. Click on the region to see more details.")}
+mapview(
+  gadm41_ECU_parishes,
+  zcol = "NAME_3",        # attribute used for fill
+  alpha.regions = 0.4,    # fill transparency
+  color = "black",        # border color
+  alpha = 1,            # border transparency
+  legend = FALSE           # remove legend
+)
+```
+
+
+# References 
+
+```{r}
+grateful::cite_packages(output = "paragraph", out.dir = ".")
+```
+
