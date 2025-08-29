@@ -83,7 +83,7 @@ Data was downloaded from [geofabrik](https://download.geofabrik.de/south-america
 ## Area  of interest
 
 
-```{r}
+```{r, out.width = "100%"}
 area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
 mapview(
   area_of_interest,
@@ -100,7 +100,7 @@ mapview(
 # Rivers
 
 
-```{r}
+```{r, out.width = "100%"}
 rivers <- readRDS("clean_data/rivers_in_aoi.RDS")
 filtered_rivers <- dplyr::filter(rivers, waterway %in% c("river", "stream"))
 mapview(
@@ -119,7 +119,7 @@ table(rivers$waterway)
 
 # Roads
 
-```{r}
+```{r, out.width = "100%"}
 roads <- readRDS("clean_data/roads_in_aoi.RDS")
 major_roads <- c(
   "motorway", "motorway_link",

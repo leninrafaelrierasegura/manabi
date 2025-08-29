@@ -95,7 +95,7 @@ Most of the layers do not contain useful information for our purposes. Here are 
 
 ## Plot the area of interest
 
-```{r}
+```{r, out.width = "100%"}
 area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
 mapview(
   area_of_interest,
