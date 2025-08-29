@@ -11,6 +11,8 @@ navbar:
       href: administrative_units.html
     - text: "Amenities"
       href: amenities.html
+    - text: "Rivers and Roads"
+      href: ways.html
 
   right:
     - icon: fa-github

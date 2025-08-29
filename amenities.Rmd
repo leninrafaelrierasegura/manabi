@@ -93,9 +93,11 @@ Most of the layers do not contain useful information for our purposes. Here are 
 - `ca04_a`: This layer contains the locations of amenities, such as schools, hospitals, and other public buildings.
 
 
+## Plot the area of interest
+
 ```{r}
 area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
-p <- mapview(
+mapview(
   area_of_interest,
   zcol = "geometry",        # attribute used for fill
   alpha.regions = 0,    # fill transparency
@@ -118,7 +120,7 @@ mapview(
   color = "black",        # border color
   alpha = 1,            # border transparency
   legend = TRUE           # remove legend
-) + p
+)
 ```
 
 # layer `loc_p`
@@ -135,7 +137,7 @@ mapview(
   cex = 1.5, #           points size
   
   legend = FALSE           # remove legend
-) + p
+) 
 ```
 
 
@@ -167,7 +169,7 @@ mapview(
     color = "black",        # border color
     alpha = 1,            # border transparency
     legend = FALSE           # remove legend
-  ) + p
+  ) 
 ```
 
 

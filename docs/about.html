@@ -256,6 +256,9 @@ $(document).ready(function () {
 <li>
   <a href="amenities.html">Amenities</a>
 </li>
+<li>
+  <a href="ways.html">Rivers and Roads</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -278,7 +281,19 @@ $(document).ready(function () {
 </div>
 
 
-<p>More about this website.</p>
+<div id="tips" class="section level1">
+<h1>Tips</h1>
+<ul>
+<li>If you are able to work directly with the polygon of the area of
+interest, use</li>
+</ul>
+<pre><code>area_of_interest &lt;- readRDS(&quot;clean_data/manabi_area_simple.RDS&quot;)</code></pre>
+<ul>
+<li>If you can only work with a box, use this instead</li>
+</ul>
+<pre><code>coords &lt;- rbind(NE, SE, SW, NW, NE) # from source(&quot;jobbers/custom_bounding_box.R&quot;)
+bbox_poly &lt;- st_sfc(st_polygon(list(coords)), crs = 4326)</code></pre>
+</div>
 
 
 

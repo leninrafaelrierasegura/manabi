@@ -2,4 +2,17 @@
 title: "About This Website"
 ---
 
-More about this website.
+# Tips
+
+- If you are able to work directly with the polygon of the area of interest, use 
+
+```
+area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
+```
+
+- If you can only work with a box, use this instead
+
+```
+coords <- rbind(NE, SE, SW, NW, NE) # from source("jobbers/custom_bounding_box.R")
+bbox_poly <- st_sfc(st_polygon(list(coords)), crs = 4326)
+```

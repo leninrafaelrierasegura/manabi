@@ -1,0 +1,153 @@
+---
+title: "Rivers and Roads from OpenStreetMap"
+date: "Last modified: `r format(Sys.time(), '%d-%m-%Y.')`"
+output:
+  html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    highlight: pygments
+    theme: flatly
+    code_folding: show # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    number_sections: true
+    fig_caption: true
+    code_download: true
+    css: visual.css
+always_allow_html: true
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+---
+
+```{r}
+# Create a clipboard button on the rendered HTML page
+source(here::here("clipboard.R")); clipboard
+# Set seed for reproducibility
+set.seed(1982) 
+# Set global options for all code chunks
+knitr::opts_chunk$set(
+  # Disable messages printed by R code chunks
+  message = FALSE,    
+  # Disable warnings printed by R code chunks
+  warning = FALSE,    
+  # Show R code within code chunks in output
+  echo = TRUE,        
+  # Include both R code and its results in output
+  include = TRUE,     
+  # Evaluate R code chunks
+  eval = TRUE,       
+  # Enable caching of R code chunks for faster rendering
+  cache = FALSE,      
+  # Align figures in the center of the output
+  fig.align = "center",
+  # Enable retina display for high-resolution figures
+  retina = 2,
+  # Show errors in the output instead of stopping rendering
+  error = TRUE,
+  # Do not collapse code and output into a single block
+  collapse = FALSE
+)
+# Start the figure counter
+fig_count <- 0
+# Define the captioner function
+captioner <- function(caption) {
+  fig_count <<- fig_count + 1
+  paste0("Figure ", fig_count, ": ", caption)
+}
+```
+
+
+```{r}
+library(sf)
+library(tmap)
+library(mapview)
+library(dplyr)
+library(osmextract)
+# set mapview options
+mapviewOptions(basemaps = c("CartoDB.Positron",
+                            "OpenStreetMap",
+                            "Esri.WorldImagery",
+                            "OpenTopoMap"))
+
+source("jobbers/custom_bounding_box.R")
+```
+
+# Introduction
+
+
+Data was downloaded from [geofabrik](https://download.geofabrik.de/south-america/ecuador.html) and contains all OSM data for Ecuador up to date. We extract rivers and roads within the area of interest. Go to this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/jobbers/ways.R)  to see how that is done.
+
+## Area  of interest
+
+
+```{r}
+area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
+mapview(
+  area_of_interest,
+  zcol = "geometry",        # attribute used for fill
+  alpha.regions = 0,    # fill transparency
+  color = "black",        # border color
+  alpha = 0.4,            # border transparency
+  legend = FALSE           # remove legend
+)
+```
+
+
+
+# Rivers
+
+
+```{r}
+rivers <- readRDS("clean_data/rivers_in_aoi.RDS")
+filtered_rivers <- dplyr::filter(rivers, waterway %in% c("river", "stream"))
+mapview(
+  filtered_rivers,       # attribute used for fill
+  zcol = "waterway",
+  legend = TRUE           # remove legend
+)
+```
+
+These are the categories of waterways available:
+
+```{r}
+table(rivers$waterway)
+```
+
+
+# Roads
+
+```{r}
+roads <- readRDS("clean_data/roads_in_aoi.RDS")
+major_roads <- c(
+  "motorway", "motorway_link",
+  "trunk", "trunk_link",
+  "primary", "primary_link",
+  "secondary", "secondary_link",
+  "tertiary", "tertiary_link"
+)
+filtered_roads <- dplyr::filter(roads, highway %in% major_roads)
+mapview(
+  filtered_roads,       # attribute used for fill
+  zcol = "highway",
+  legend = TRUE           # remove legend
+)
+```
+
+
+These are the categories of highways available:
+
+```{r}
+table(roads$highway)
+```
+
+# References 
+
+```{r}
+grateful::cite_packages(output = "paragraph", out.dir = ".")
+```
+
+
+
