@@ -39,17 +39,6 @@ saveRDS(gadm41_ECU_province_level_filtered, "clean_data/gadm41_ECU_province_leve
 saveRDS(gadm41_ECU_canton_level_filtered, "clean_data/gadm41_ECU_canton_level_filtered.RDS")
 saveRDS(gadm41_ECU_parish_level_filtered, "clean_data/gadm41_ECU_parish_level_filtered.RDS")
 
-# p <- ggplot(gadm41_ECU_province_level_filtered) +
-#   geom_sf(aes(fill = NAME_1, text = NAME_1), color = "black", size = 0.2) +
-#   geom_sf_text(aes(label = NAME_1), size = 2) +
-#   theme_minimal() +
-#   theme(legend.position = "none")
-# 
-# ggplotly(p)
-# mapview::mapview(gadm41_ECU_province_level_filtered)
-# tmap_mode("view")   
-# tm_shape(gadm41_ECU_province_level_filtered) +
-#   tm_polygons("NAME_1")
 
 # Now I want the bounding box of Manabi
 # Extract the Manabí bounding box
@@ -90,7 +79,6 @@ coords <- rbind(NE, SE, SW, NW, NE) # from source("jobbers/custom_bounding_box.R
 crop_polygon <- st_polygon(list(coords)) %>% 
   st_sfc(crs = st_crs(gadm41_ECU_country_level_filtered)) # match CRS of your data
 
-# Optional: convert to sf object
 crop_polygon_sf <- st_sf(geometry = crop_polygon)
 mapview::mapview(crop_polygon_sf)
 
@@ -108,21 +96,4 @@ saveRDS(gadm41_ECU_country_custom, "clean_data/gadm41_ECU_country_custom.RDS")
 saveRDS(gadm41_ECU_province_custom, "clean_data/gadm41_ECU_province_custom.RDS")
 saveRDS(gadm41_ECU_canton_custom, "clean_data/gadm41_ECU_canton_custom.RDS")
 saveRDS(gadm41_ECU_parish_custom, "clean_data/gadm41_ECU_parish_custom.RDS")
-
-
-# Optional: visualize
-# tmap_mode("view")
-# tmap_options(basemaps = c("OpenStreetMap", "Esri.WorldGrayCanvas", "Esri.WorldTopoMap"))
-# tm_shape(gadm41_ECU_province_cropped) + tm_polygons("NAME_1", alpha = 0.4, border.col = "black", border.alpha = 0.8)
-# mapview::mapviewOptions(basemaps = c("OpenStreetMap",
-#                             "Esri.WorldImagery",
-#                             "OpenTopoMap"))
-# mapview::mapview(
-#   gadm41_ECU_province_cropped,
-#   zcol = "NAME_1",        # attribute used for fill
-#   alpha.regions = 0.4,    # fill transparency
-#   color = "black",        # border color
-#   alpha = 0.8,             # border transparency
-#   legend = FALSE          # show legend
-# )
 

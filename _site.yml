@@ -13,6 +13,8 @@ navbar:
       href: amenities.html
     - text: "Rivers and Roads"
       href: ways.html
+    - text: "Elevation"
+      href: elevation.html
 
   right:
     - icon: fa-github

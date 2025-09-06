@@ -78,7 +78,7 @@ source("jobbers/custom_bounding_box.R")
 # Introduction
 
 
-Data was downloaded from [geofabrik](https://download.geofabrik.de/south-america/ecuador.html) and contains all OSM data for Ecuador up to date. We extract rivers and roads within the area of interest. Go to this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/jobbers/ways.R)  to see how that is done.
+Data was downloaded from [geofabrik](https://download.geofabrik.de/south-america/ecuador.html) and contains all OSM data for Ecuador up to date. We extract rivers and roads within the area of interest. Go to this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/ways.R)  to see how that is done.
 
 ## Area  of interest
 

@@ -1,0 +1,124 @@
+---
+title: "Elevation"
+date: "Last modified: `r format(Sys.time(), '%d-%m-%Y.')`"
+output:
+  html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    highlight: pygments
+    theme: flatly
+    code_folding: show # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    number_sections: true
+    fig_caption: true
+    code_download: true
+    css: visual.css
+always_allow_html: true
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+---
+
+```{r}
+# Create a clipboard button on the rendered HTML page
+source(here::here("clipboard.R")); clipboard
+# Set seed for reproducibility
+set.seed(1982) 
+# Set global options for all code chunks
+knitr::opts_chunk$set(
+  # Disable messages printed by R code chunks
+  message = FALSE,    
+  # Disable warnings printed by R code chunks
+  warning = FALSE,    
+  # Show R code within code chunks in output
+  echo = TRUE,        
+  # Include both R code and its results in output
+  include = TRUE,     
+  # Evaluate R code chunks
+  eval = TRUE,       
+  # Enable caching of R code chunks for faster rendering
+  cache = FALSE,      
+  # Align figures in the center of the output
+  fig.align = "center",
+  # Enable retina display for high-resolution figures
+  retina = 2,
+  # Show errors in the output instead of stopping rendering
+  error = TRUE,
+  # Do not collapse code and output into a single block
+  collapse = FALSE
+)
+# Start the figure counter
+fig_count <- 0
+# Define the captioner function
+captioner <- function(caption) {
+  fig_count <<- fig_count + 1
+  paste0("Figure ", fig_count, ": ", caption)
+}
+```
+
+
+```{r}
+library(sf)
+library(mapview)
+library(dplyr)
+library(terra)
+# set mapview options
+mapviewOptions(basemaps = c("CartoDB.Positron",
+                            "OpenStreetMap",
+                            "Esri.WorldImagery",
+                            "OpenTopoMap"))
+```
+
+
+
+# Introduction
+
+Data was downloaded from [OpenTopography](https://portal.opentopography.org/raster?opentopoID=OTSDEM.032021.4326.3). There are two resolutions available, 30m and 90m. You get a GeoTIFF file for each resolution.
+
+
+Go to this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/elevation.R)  to see how the data was handled.
+
+Here is a summary of the steps taken:
+
+- The data was clipped to the study area using the polygon in [`manabi_area_simple.RDS`](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/manabi_area_simple.RDS). Two files are produced:  [`dem30_manabi.tif`](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/dem30_manabi.tif) and [`dem90_manabi.tif`](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/dem90_manabi.tif).
+
+- The resulting dataset was classified into elevation ranges: 0-50m, 50-150m, 150-250m, 250-350m, 350-450m, 450-750m, and above 750m. The resulting regions are stored in [`dem_polygons_manabi.RDS`](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/dem_polygons_manabi.RDS).
+
+
+# Elevation data
+
+```{r, out.width = "100%"}
+dem90_mask <- rast("clean_data/dem90_manabi.tif")
+mapview(dem90_mask, col.regions = terrain.colors(100), maxpixels = 4e+05)
+```
+
+# Elevation ranges
+
+```{r, out.width = "100%"}
+elevation_ranges <- readRDS("clean_data/dem_polygons_manabi.RDS")
+mapview(dplyr::filter(elevation_ranges, elevation_range != "0: NoData/Below 0"), zcol = "elevation_range", alpha.regions = 0.5)
+```
+
+150-250m is the sweet spot.
+
+Known spots for reference:
+
+- [El Rosario](https://mapcarta.com/es/19661918) ~ 200m
+- [La polvareda](https://mapcarta.com/es/W435020166) ~ 200m
+- El Congoma ~ 200m
+- [La Montufar](https://mapcarta.com/es/N2506430045) ~ 640m
+- [Las Mercedes](https://mapcarta.com/es/29290582) ~ 750m
+
+
+# References 
+
+```{r}
+grateful::cite_packages(output = "paragraph", out.dir = ".")
+```
+
+
+
+

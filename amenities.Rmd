@@ -76,9 +76,11 @@ mapviewOptions(basemaps = c("CartoDB.Positron",
 
 In this section, we will explore the amenities available in the Geodatabase Nacional of Ecuador. The data was obtained from this [website](https://www.ecuadorencifras.gob.ec/documentos/web-inec/Geografia_Estadistica/Micrositio_geoportal/index.html). On the page, go to the bottom section (called Cartografia Historica) of the page and click on `2022` and then on the `Descarga de Marco Geoestadístico 2021` button. This will download a file named `GEODATABASE_NACIONAL_2021.zip`. Unzip the file and you will find a folder named `GEODATABASE_NACIONAL_2021`. Inside this folder, there is a file named `GEODATABASE_NACIONAL_2021.gpkg`, which is a geopackage file containing several (9) layers. Using the [`manabi_area_simple.RDS`](https://github.com/leninrafaelrierasegura/manabi/blob/main/clean_data/manabi_area_simple.RDS) file, I filtered the contents of each layer.
 
+Go to this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/amenities.R)  to see how that is done.
+
 ---
 
-By the way, the number of the layers are:
+By the way, the layers names are:
 
 ```{r}
 LAYERS_name <- c("viv_p", "ejes_l", "zon_a", "sec_a", "loc_p", "ingresos_l", "ca04_a", "aream_a", "man_a")
@@ -144,26 +146,17 @@ mapview(
 # layer `ca04_a`
 
 ```{r}
-# ca04_a <- readRDS("clean_data/ca04_a_cropped_to_manabi.RDS")
-# amn <- unique(ca04_a$cod_otros) # check the unique values of the cod_otros column
-# amn
-#  [1] NA                         "EDIFICIO EDUCACIONAL"     "TEMPLO RELIGIOSO"        
-#  [4] "CASA COMUNAL"             "EDIFICIO IMPORTANTE"      "EDIFICIO DE REFERENCIA"  
-#  [7] "CAMPO DEPORTIVO"          "CEMENTERIO"               "GASOLINERA"              
-# [10] "ESTABLECIMIENTO DE SALUD" "PARQUE"                   "PLAZA"                   
-# [13] "TANQUE DE AGUA"           "EDIFICIO REFERENCIA" 
-# for (i in 2:length(amn)) {
-#   aux <- filter(ca04_a, cod_otros == amn[i])
-#   saveRDS(aux, paste0("clean_data/amn_", gsub(" ", "_", amn[i]), ".RDS"))
-# }
+ca04_a <- readRDS("clean_data/ca04_a_cropped_to_manabi.RDS")
+amn <- unique(ca04_a$cod_otros) # check the unique values of the cod_otros column
+amn
 ```
 
 Here we can see the `EDIFICIO EDUCACIONAL` amenities.
 
 ```{r, out.width = "100%", fig.cap = captioner("Educational buildings.")}
-amn_EDIFICIO_EDUCACIONAL <- readRDS("clean_data/amn_EDIFICIO_EDUCACIONAL.RDS")
+EDIFICIO_EDUCACIONAL <- readRDS("clean_data/amn_EDIFICIO_EDUCACIONAL.RDS")
 mapview(
-    amn_EDIFICIO_EDUCACIONAL,
+    EDIFICIO_EDUCACIONAL,
     zcol = "nom_edif",        # attribute used for fill
     alpha.regions = 0.4,    # fill transparency
     color = "black",        # border color
@@ -172,7 +165,19 @@ mapview(
   ) 
 ```
 
+Here we can see the `ESTABLECIMIENTO DE SALUD` amenities.
 
+```{r, out.width = "100%", fig.cap = captioner("Hospital buildings.")}
+ESTABLECIMIENTO_DE_SALUD <- readRDS("clean_data/amn_ESTABLECIMIENTO_DE_SALUD.RDS")
+mapview(
+    ESTABLECIMIENTO_DE_SALUD,
+    zcol = "nom_edif",        # attribute used for fill
+    alpha.regions = 0.4,    # fill transparency
+    color = "black",        # border color
+    alpha = 1,            # border transparency
+    legend = FALSE           # remove legend
+  ) 
+```
 
 
 # References 
