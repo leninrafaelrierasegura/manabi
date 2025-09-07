@@ -115,7 +115,7 @@ gadm41_ECU_parishes <- readRDS("clean_data/gadm41_ECU_parish_custom.RDS")
 
 I choose the following polygon to delimit the area of interest. The polygon is defined by the coordinates of the four corners: Northeast, Southeast, Southwest, and Northwest.
 
-```{r, out.width = "100%", fig.cap = captioner("This shows the polygon that delimits the area of interest. Click on the region to see more details.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("This shows the polygon that delimits the area of interest. Click on the region to see more details.")}
 coords <- rbind(NE, SE, SW, NW, NE) # from source("jobbers/custom_bounding_box.R")
 crop_polygon <- st_polygon(list(coords)) %>% 
   st_sfc(crs = st_crs(gadm41_ECU_country)) # match CRS of your data
@@ -130,7 +130,7 @@ mapview::mapview(crop_polygon_sf,
 
 ## At the country level
 
-```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the country level. Click on the region to see more details.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("This shows the region of interest at the country level. Click on the region to see more details.")}
 mapview(
   gadm41_ECU_country,
   zcol = "COUNTRY",        # attribute used for fill
@@ -143,7 +143,7 @@ mapview(
 
 ## At the province level
 
-```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the province level. Click on the region to see more details.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("This shows the region of interest at the province level. Click on the region to see more details.")}
 mapview(
   gadm41_ECU_provinces,
   zcol = "NAME_1",        # attribute used for fill
@@ -156,7 +156,7 @@ mapview(
 
 ## At the canton level
 
-```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the canton level. Click on the region to see more details.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("This shows the region of interest at the canton level. Click on the region to see more details.")}
 mapview(
   gadm41_ECU_cantons,
   zcol = "NAME_2",        # attribute used for fill
@@ -169,7 +169,7 @@ mapview(
 
 ## At the parish level
 
-```{r, out.width = "100%", fig.cap = captioner("This shows the region of interest at the parish level. Click on the region to see more details.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("This shows the region of interest at the parish level. Click on the region to see more details.")}
 mapview(
   gadm41_ECU_parishes,
   zcol = "NAME_3",        # attribute used for fill

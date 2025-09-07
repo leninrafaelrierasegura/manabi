@@ -97,7 +97,7 @@ Most of the layers do not contain useful information for our purposes. Here are 
 
 ## Plot the area of interest
 
-```{r, out.width = "100%"}
+```{r, out.width = "100%", fig.height = 12}
 area_of_interest <- readRDS("clean_data/manabi_area_simple.RDS")
 mapview(
   area_of_interest,
@@ -113,7 +113,7 @@ mapview(
 
 
 
-```{r, out.width = "100%", fig.cap = captioner("Area of the head of the administrative units.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("Area of the head of the administrative units.")}
 aream_a <- readRDS("clean_data/aream_a_cropped_to_manabi.RDS")
 mapview(
   aream_a,
@@ -128,7 +128,7 @@ mapview(
 # layer `loc_p`
 
 
-```{r, out.width = "100%", fig.cap = captioner("Small towns and villages, apparently.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("Small towns and villages, apparently.")}
 loc_p <- readRDS("clean_data/loc_p_cropped_to_manabi.RDS")
 mapview(
   loc_p,
@@ -153,7 +153,7 @@ amn
 
 Here we can see the `EDIFICIO EDUCACIONAL` amenities.
 
-```{r, out.width = "100%", fig.cap = captioner("Educational buildings.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("Educational buildings.")}
 EDIFICIO_EDUCACIONAL <- readRDS("clean_data/amn_EDIFICIO_EDUCACIONAL.RDS")
 mapview(
     EDIFICIO_EDUCACIONAL,
@@ -167,7 +167,7 @@ mapview(
 
 Here we can see the `ESTABLECIMIENTO DE SALUD` amenities.
 
-```{r, out.width = "100%", fig.cap = captioner("Hospital buildings.")}
+```{r, out.width = "100%", fig.height = 12, fig.cap = captioner("Hospital buildings.")}
 ESTABLECIMIENTO_DE_SALUD <- readRDS("clean_data/amn_ESTABLECIMIENTO_DE_SALUD.RDS")
 mapview(
     ESTABLECIMIENTO_DE_SALUD,

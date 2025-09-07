@@ -90,24 +90,25 @@ Here is a summary of the steps taken:
 
 # Elevation data
 
-```{r, out.width = "100%"}
+```{r, out.width = "100%", fig.height = 12}
 dem90_mask <- rast("clean_data/dem90_manabi.tif")
-mapview(dem90_mask, col.regions = terrain.colors(100), maxpixels = 4e+05)
+mapview(dem90_mask, col.regions = terrain.colors(100))
 ```
 
 # Elevation ranges
 
-```{r, out.width = "100%"}
+```{r, out.width = "100%", fig.height = 12}
 elevation_ranges <- readRDS("clean_data/dem_polygons_manabi.RDS")
-mapview(dplyr::filter(elevation_ranges, elevation_range != "0: NoData/Below 0"), zcol = "elevation_range", alpha.regions = 0.5)
+elev_map <- dplyr::filter(elevation_ranges, elevation_range != "0: NoData/Below 0")
+mapview(elev_map, zcol = "elevation_range", alpha.regions = 0.5)
 ```
 
-150-250m is the sweet spot.
+[150-250m is the sweet spot](elevation_aux.html).
 
 Known spots for reference:
 
 - [El Rosario](https://mapcarta.com/es/19661918) ~ 200m
-- [La polvareda](https://mapcarta.com/es/W435020166) ~ 200m
+- [La Polvareda](https://mapcarta.com/es/W435020166) ~ 200m
 - El Congoma ~ 200m
 - [La Montufar](https://mapcarta.com/es/N2506430045) ~ 640m
 - [Las Mercedes](https://mapcarta.com/es/29290582) ~ 750m
