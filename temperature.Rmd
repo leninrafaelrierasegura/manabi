@@ -1,0 +1,162 @@
+---
+title: "Temperature"
+date: "Last modified: `r format(Sys.time(), '%d-%m-%Y.')`"
+output:
+  html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    highlight: pygments
+    theme: flatly
+    code_folding: show # class.source = "fold-hide" to hide code and add a button to show it
+    df_print: paged
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    number_sections: true
+    fig_caption: true
+    code_download: true
+    css: visual.css
+always_allow_html: true
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+---
+
+```{r}
+# Create a clipboard button on the rendered HTML page
+source(here::here("clipboard.R")); clipboard
+# Set seed for reproducibility
+set.seed(1982) 
+# Set global options for all code chunks
+knitr::opts_chunk$set(
+  # Disable messages printed by R code chunks
+  message = FALSE,    
+  # Disable warnings printed by R code chunks
+  warning = FALSE,    
+  # Show R code within code chunks in output
+  echo = TRUE,        
+  # Include both R code and its results in output
+  include = TRUE,     
+  # Evaluate R code chunks
+  eval = TRUE,       
+  # Enable caching of R code chunks for faster rendering
+  cache = FALSE,      
+  # Align figures in the center of the output
+  fig.align = "center",
+  # Enable retina display for high-resolution figures
+  retina = 2,
+  # Show errors in the output instead of stopping rendering
+  error = TRUE,
+  # Do not collapse code and output into a single block
+  collapse = FALSE
+)
+# Start the figure counter
+fig_count <- 0
+# Define the captioner function
+captioner <- function(caption) {
+  fig_count <<- fig_count + 1
+  paste0("Figure ", fig_count, ": ", caption)
+}
+```
+
+
+```{r}
+library(sf)
+library(mapview)
+library(dplyr)
+library(terra)
+# set mapview options
+mapviewOptions(basemaps = c("CartoDB.Positron",
+                            "OpenStreetMap",
+                            "Esri.WorldImagery",
+                            "OpenTopoMap"))
+```
+
+
+
+# Introduction
+
+
+
+Data was downloaded from [WorldClim](https://www.worldclim.org/) using the `geodata` package. The data represents average monthly temperature at a spatial resolution of 30 arc-seconds (approximately 1 km² at the equator). You get 12 raster layers, one for each month of the year. The data is in degrees Celsius and it was collected from 1970 to 2000.
+
+Go to this [file](https://github.com/leninrafaelrierasegura/manabi/blob/main/temperature.R)  to see how the data was handled.
+
+
+Here is a summary of the steps taken:
+
+- For the monthly average temperature data, we calculated the mean across the 12 layers to get the average climatology.
+
+- For the monthly minimum temperature data, we calculated the minimum across the 12 layers.
+
+- For the monthly maximum temperature data, we calculated the maximum across the 12 layers.
+
+- We then clipped the rasters to the area of interest (Manabí province) using a polygon shapefile.
+
+- Finally, we applied a condition to identify suitable areas where the minimum temperature is greater than or equal to 18°C and the maximum temperature is less than or equal to 30°C. (this is done in this file)
+
+
+```{r}
+manabi_avg_temp <- rast("clean_data/manabi_avg_temp.tif")
+manabi_min_temp <- rast("clean_data/manabi_min_temp.tif")
+manabi_max_temp <- rast("clean_data/manabi_max_temp.tif")
+
+# Compute global range
+all_min <- min(minmax(manabi_avg_temp), minmax(manabi_min_temp), minmax(manabi_max_temp))
+all_max <- max(minmax(manabi_avg_temp), minmax(manabi_min_temp), minmax(manabi_max_temp))
+
+all_min; all_max
+```
+
+# Avearage Temperature
+
+```{r, out.width = "100%", fig.height = 12}
+mapview(manabi_avg_temp, layer.name = "Avg Temp (°C)", at = seq(all_min, all_max, length.out = 101), legend = FALSE)
+```
+
+
+# Minimum Temperature
+
+```{r, out.width = "100%", fig.height = 12}
+mapview(manabi_min_temp, layer.name = "Min Temp (°C)", at = seq(all_min, all_max, length.out = 101), legend = FALSE)
+```
+
+# Maximum Temperature
+
+```{r, out.width = "100%", fig.height = 12}
+mapview(manabi_max_temp, layer.name = "Max Temp (°C)", at = seq(all_min, all_max, length.out = 101), legend = FALSE)
+```
+
+# Suitable area
+
+```{r}
+suitable_area <- (manabi_min_temp >= 19.5) & (manabi_max_temp <= 30)
+
+suitable_min <- mask(manabi_min_temp, suitable_area, maskvalues = 0)
+suitable_max <- mask(manabi_max_temp, suitable_area, maskvalues = 0)
+
+# Stack the two rasters into a single multi-layer raster
+suitable_stack <- c(suitable_min, suitable_max)
+
+# Optional: rename the layers for clarity
+names(suitable_stack) <- c("Tmin", "Tmax")
+
+```
+
+Below we show the minimum temperature layer of the suitable area. The important thing is the area.
+
+
+```{r, out.width = "100%", fig.height = 12}
+mapview(suitable_stack, layer.name = "Suitable Min Temp (°C)", legend = TRUE)
+```
+
+
+
+# References 
+
+```{r}
+grateful::cite_packages(output = "paragraph", out.dir = ".")
+```
+
+
+
